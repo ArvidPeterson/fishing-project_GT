@@ -3,10 +3,10 @@ class FishStock:
     def __init__(self):
 
         # Todo: Set reasonable parameter values
-        self.carrying_cap = 100
-        self.growth_rate = 10
-        self.catch_coeff = 1
-        self.X = 10
+        self.carrying_cap = 5000
+        self.growth_rate = 0.1
+        self.catch_coeff = 0.01
+        self.X = 0
 
     def fish_stock_change(self, list_of_fishers):
         sum_of_harvest = 0

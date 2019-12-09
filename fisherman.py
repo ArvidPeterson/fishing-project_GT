@@ -1,9 +1,9 @@
 class Fisherman:
 
     def __init__(self):
-        self.effort = 1
-        self.price_per_harvest = 1
-        self.cost_per_effort = 1
+        self.effort = 0
+        self.price_per_harvest = 500
+        self.cost_per_effort = 300
         self.harvest = 0
         self.profit = 0
 
