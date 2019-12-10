@@ -25,13 +25,16 @@ def stable_solution(list_of_fishers, fish_stock):
     return stable_effort_all_players
 
 
-def go_fishing(nbr_players, max_time, effort_of_round):
+def go_fishing(nbr_players, max_time, effort_of_round=[], list_of_fishers=[]):
     # Assume same effort for all players
 
-    list_of_fishers = []
-    for i in range(nbr_players):
-        list_of_fishers.append(Fisherman())
-        list_of_fishers[i].effort = effort_of_round[i]
+    # list_of_fishers = []
+    # for i in range(nbr_players):
+    #     list_of_fishers.append(Fisherman())
+    #     list_of_fishers[i].effort = effort_of_round[i]
+
+    if len(list_of_fishers) < 1:
+        list_of_fishers = [Fisherman(effort=effort_of_round[i]) for i in range(nbr_players)]
 
     fish_stock = FishStock()
     fish_stock.X = 5000
