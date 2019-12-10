@@ -31,7 +31,7 @@ def go_fishing(nbr_players, max_time, effort_of_round):
     list_of_fishers = []
     for i in range(nbr_players):
         list_of_fishers.append(Fisherman())
-        list_of_fishers[i].effort = effort_of_round
+        list_of_fishers[i].effort = effort_of_round[i]
 
     fish_stock = FishStock()
     fish_stock.X = 5000
@@ -68,17 +68,18 @@ def main():
 
     nbr_players = 2
 
-    # Todo: Set reasonable maximal time
+    # Todo: Set reasonable maximal time and maximal effort
     max_time = 500
-
     max_effort = 15
+
     effort_sweep = np.linspace(0, max_effort, num=100)
 
     profit = np.zeros([nbr_players, len(effort_sweep)])
     fish_stock = np.zeros([max_time, len(effort_sweep)])
     harvest = np.zeros([nbr_players, max_time, len(effort_sweep)])
     for i, i_effort in enumerate(effort_sweep):
-        profit[:, i], fish_stock[:, i], harvest[:, :, i] = go_fishing(nbr_players, max_time, i_effort)
+        effort_of_round = [i_effort, i_effort]
+        profit[:, i], fish_stock[:, i], harvest[:, :, i] = go_fishing(nbr_players, max_time, effort_of_round)
 
     plt.plot(effort_sweep, profit[1, :])
     plt.show()
