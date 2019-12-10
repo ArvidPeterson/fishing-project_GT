@@ -49,6 +49,7 @@ def calc_new_population(profits, population, population_counter):
     pass
 
 def mutate_population(population):
+    # mutate population
     pass
 
 
