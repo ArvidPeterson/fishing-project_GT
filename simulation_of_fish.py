@@ -80,7 +80,10 @@ def main():
     for i, i_effort in enumerate(effort_sweep):
         profit[:, i], fish_stock[:, i], harvest[:, :, i] = go_fishing(nbr_players, max_time, i_effort)
 
-    plt.plot(effort_sweep, profit[1, :])
+    fig, ax = plt.subplots(1,1)
+    ax.plot(effort_sweep, profit[1, :])
+    ax.set_xlabel('Fishing effort')
+    ax.set_ylabel('Total profit')
     plt.show()
 
 if __name__ == '__main__':
