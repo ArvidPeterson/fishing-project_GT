@@ -1,6 +1,7 @@
 from fisherman import *
 from fish_stock import *
 from simulation_of_fish import go_fishing
+from plot_functions import *
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,6 +25,7 @@ def evolutionary_dynamics(init_population_size,
     population = [Fisherman(effort=efforts[i]) for i in range(init_population_size)]
     population_counter = [1000 for ii in range(init_population_size)]# keeps track of the number
                                                              # of individuals of each genotype
+    plot_histogram(population, population_counter, 0)
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_counter):
@@ -49,6 +51,7 @@ def evolutionary_dynamics(init_population_size,
             pass
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
+        plot_histogram(population, population_counter, t)
     print('done')
 
 def calc_new_population(profits, population, population_counter, mutation_rate=1e-2):
@@ -69,11 +72,12 @@ def calc_new_population(profits, population, population_counter, mutation_rate=1
     # resize the population in proportion to fitness
     for idx, pop_size in enumerate(population_counter):
         # import pdb; pdb.set_trace()
-            population_counter[idx] +=  + scaling_factor * (scores[idx] - scores_bar)
-            population_counter[idx] = int(population_counter[idx])
-            # import pdb; pdb.set_trace()
-            if population_counter[idx] < 1:
-                extinct_fishers.append(idx)
+        pop_update = scaling_factor * (scores[idx] - scores_bar)
+        population_counter[idx] += pop_update
+        population_counter[idx] = int(population_counter[idx])
+        # import pdb; pdb.set_trace()
+        if population_counter[idx] < 1:
+            extinct_fishers.append(idx)
     #import pdb; pdb.set_trace()
     # remove fishermen versions where all are extinct
     n_popped = 0
@@ -88,7 +92,7 @@ def calc_new_population(profits, population, population_counter, mutation_rate=1
 
 
 
-def mutate_population(population, population_counter, mutation_rate=20e-2):
+def mutate_population(population, population_counter, mutation_rate=5e-2):
     
     # create new mutated fishermen
     new_fishers = []
@@ -112,4 +116,6 @@ def mutate_population(population, population_counter, mutation_rate=20e-2):
 
 if __name__ == '__main__':
         population_size = 100
+        initialize_plot()
         evolutionary_dynamics(population_size)
+

@@ -5,7 +5,7 @@ def initialize_plot():
     plt.ylabel('Frequency')
     plt.xlabel('Effort')
 
-def plot_histogram(population, population_counter, t, efforts):
+def plot_histogram(population, population_counter, generation):
 
     # make list of efforts
     effort_in_pop = []
@@ -16,8 +16,8 @@ def plot_histogram(population, population_counter, t, efforts):
     fig = plt.gcf()
     ax = plt.gca()
     ax.bar(effort_in_pop, population_counter, color='b')
-    ax.set_title('Generation '+ str(t+1))
+    ax.set_title('Generation '+ str(generation+1))
     ax.set_xlim(0, 14)
-    ax.set_xticks(effort_in_pop)
+    # ax.set_xticks(effort_in_pop)
     plt.draw()
-    plt.pause(0.5)
+    plt.pause(0.01)
