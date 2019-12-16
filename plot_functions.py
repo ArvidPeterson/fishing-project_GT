@@ -14,6 +14,7 @@ def plot_histogram(population, population_counter, generation):
 
     # plot histogram
     fig = plt.gcf()
+    fig.clf()
     ax = plt.gca()
     ax.bar(effort_in_pop, population_counter, color='b')
     ax.set_title('Generation '+ str(generation+1))
