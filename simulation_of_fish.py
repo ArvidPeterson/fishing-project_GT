@@ -25,42 +25,17 @@ def stable_solution(list_of_fishers, fish_stock):
     return stable_effort_all_players
 
 
-def go_fishing(nbr_players, max_time, effort_of_round=[], list_of_fishers=[]):
-    # Assume same effort for all players
+def update_effort(stock, list_of_fishers):
 
-    # list_of_fishers = []
-    # for i in range(nbr_players):
-    #     list_of_fishers.append(Fisherman())
-    #     list_of_fishers[i].effort = effort_of_round[i]
-
-    if len(list_of_fishers) < 1:
-        list_of_fishers = [Fisherman(effort=effort_of_round[i]) for i in range(nbr_players)]
-
-    fish_stock = FishStock()
-    fish_stock.X = 5000
-
-    harvest_array = np.zeros([max_time, nbr_players])
-    fish_stock_array = np.zeros([max_time])
-    total_profit = np.zeros([nbr_players])
-
-    # Calculate stable solution:
-    #stable_effort_all = stable_solution(list_of_fishers, fish_stock)
-    #print("Stable effort: ", stable_effort_all)
-
-    for t in range(max_time):
-        fish_stock_array[t] = fish_stock.X
-        fish_stock.fish_stock_change(list_of_fishers)
-
-        for i, fisher in enumerate(list_of_fishers):
-            harvest_array[t, i] = fisher.harvest
-            fisher.calculate_profit()
-            total_profit[i] += fisher.profit
-
-        if fish_stock.X < 1e-10:
-            #print("Fish stock depleted at iteration ", t)
-            break
-
-    return total_profit, fish_stock_array, harvest_array
+    nbr_fishers = len(list_of_fishers)
+    total_effort = sum([fisher.effort for fisher in list_of_fishers])   
+    effort_bar = total_effort/nbr_fishers
+    
+    # calculate effort for every player and calculate profit
+    for fisher in list_of_fishers:
+        # effort_bar_fisher = (effort_bar*nbr_fishers-fisher.effort)/(nbr_fishers-1)
+        # fisher.effort = fisher.gene[0]+fisher.gene[1]*effort_bar_fisher
+        fisher.update_effort(E_bar=effort_bar, n_players=len(list_of_fishers))
 
 
 def main():
@@ -80,7 +55,7 @@ def main():
         print("Player 1 with effort ", round(i_effort, 2), "against all player 2 efforts.")
         for j, j_effort in enumerate(effort_sweep):
             effort_of_round = [i_effort, j_effort]
-            ij_profit, round_fish_stock, ij_harvest = go_fishing(nbr_players, max_time, effort_of_round)
+            # ij_profit, round_fish_stock, ij_harvest = update_effort(nbr_players, max_time, effort_of_round)
 
             profit[j, i] = ij_profit[0]
             fish_stock[:, i, j] = round_fish_stock

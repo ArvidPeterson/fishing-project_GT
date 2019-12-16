@@ -1,12 +1,12 @@
 class FishStock:
 
-    def __init__(self):
+    def __init__(self, init_stock_size=0):
 
         # Todo: Set reasonable parameter values
         self.carrying_cap = 5000
         self.growth_rate = 0.1
         self.catch_coeff = 0.01
-        self.X = 0
+        self.X = init_stock_size
 
     def fish_stock_change(self, list_of_fishers):
         sum_of_harvest = 0

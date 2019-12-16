@@ -33,11 +33,11 @@ def evolutionary_dynamics(init_population_size,
         # population size can vary in time as new genes emerge
         population_size = len(population) # not equal to the number of individuals more like n_species 
         profits = np.zeros((population_size, population_size))
-        for fisher in population: # squeeze effort into interval [effort_min, effort_max]
-            if fisher.effort > effort_max:
-                fisher.effort = effort_max
-            elif fisher.effort < 0.0:
-                fisher.effort = 0.0
+        # for fisher in population: # squeeze effort into interval [effort_min, effort_max]
+        #     if fisher.effort > effort_max:
+        #         fisher.effort = effort_max
+        #     elif fisher.effort < 0.0:
+        #         fisher.effort = 0.0
 
         # all vs all tournament
         for ii in range(population_size):

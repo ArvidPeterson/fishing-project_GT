@@ -1,12 +1,12 @@
 from fisherman import *
 from fish_stock import *
-from simulation_of_fish import go_fishing
+from simulation_of_fish import update_effort
 from plot_functions import *
 
 import numpy as np
 import matplotlib.pyplot as plt
 import warnings
-from random import random
+import random
 import sys
 
 def evolutionary_dynamics(init_population_size, 
@@ -21,30 +21,37 @@ def evolutionary_dynamics(init_population_size,
     step_size = (effort_max - effort_min) / init_population_size
     efforts = [step_size * ii for ii in range(init_population_size)]
     efforts = np.round(efforts, effort_resolution)
+    base_effort = 1.0 / init_population_size
     
-    population = [Fisherman(effort=efforts[i]) for i in range(init_population_size)]
-    population_counter = [1000 for ii in range(init_population_size)]# keeps track of the number
-                                                             # of individuals of each genotype
-    plot_histogram(population, population_counter, 0)
+    genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(init_population_size)]
+    # init population
+    population = [Fisherman(gene=genes[i]) for i in range(init_population_size)]
+    population_counter = {population[ii]:1000 for ii in range(init_population_size)}# keeps track of the number
+                                                                                    # of individuals of each genotype
+    # init fish stock
+    stock = FishStock(init_stock_size=5000)
+    # plot_histogram(population, population_counter, 0)
+    
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_counter):
             raise Exception('population and population_counter inconsistent')
         # population size can vary in time as new genes emerge
         population_size = len(population) # not equal to the number of individuals more like n_species 
-        profits = np.zeros((population_size, population_size))
-        for fisher in population: # squeeze effort into interval [effort_min, effort_max]
-            if fisher.effort > effort_max:
-                fisher.effort = effort_max
-            elif fisher.effort < 0.0:
-                fisher.effort = 0.0
+        profits = np.zeros(population_size)
 
-        # all vs all tournament
-        for ii in range(population_size):
-            for jj in range(ii, population_size):
-                total_profit, fish_stock_array, harvest_array = go_fishing(2, max_time=t_max, list_of_fishers=[population[ii], population[jj]])
-                profits[ii, jj] = total_profit[0]
         
+        # update efforts depending on others effort at t-1
+        update_effort(stock=stock, list_of_fishers=population)
+        
+        # update harvest for every fisher and change stock size
+        stock.fish_stock_change(population)
+        if stock.X < 1.0:
+            print(f'Stock depleated at {t}')
+            break
+        
+        # calculate profit
+        profits = [fisher.calculate_profit() for fisher in population]
         population, population_counter = calc_new_population(profits, population, population_counter)
         if len(population) < 2:
             import pdb; pdb.set_trace()
@@ -55,64 +62,42 @@ def evolutionary_dynamics(init_population_size,
     print('done')
 
 def calc_new_population(profits, population, population_counter, mutation_rate=1e-2):
-    # return array of proportions of the new
-    # np.dstack(np.unravel_index(np.argsort(profits.ravel()), profits.shape))
+
     scaling_factor = 0.001
-    n_individuals = sum(population_counter)
-    with warnings.catch_warnings():
-        warnings.filterwarnings('error')
-        try:
-            scores = [sum(profits[:, ii] * population_counter[ii] / n_individuals) for ii in range(len(profits[0,:]))]
-            scores_bar = sum([scores[ii] * population_counter[ii] for ii in range(len(scores))]) / n_individuals
-        except Warning as identifier:
-            import pdb; pdb.set_trace()
-            pass
+    
+
     extinct_fishers = []
+    # import pdb; pdb.set_trace()
+    profits_mean = np.mean(profits)
+
+    for i, fisher in enumerate(population):
+        population_counter[fisher] += int(scaling_factor*(fisher.profit - profits_mean))
+        # import pdb; pdb.set_trace()
+        if population_counter[fisher] < 1:
+            del population_counter[fisher]
+            extinct_fishers.append(fisher)
     
-    # resize the population in proportion to fitness
-    for idx, pop_size in enumerate(population_counter):
-        # import pdb; pdb.set_trace()
-        pop_update = scaling_factor * (scores[idx] - scores_bar)
-        population_counter[idx] += pop_update
-        population_counter[idx] = int(population_counter[idx])
-        # import pdb; pdb.set_trace()
-        if population_counter[idx] < 1:
-            extinct_fishers.append(idx)
-    #import pdb; pdb.set_trace()
-    # remove fishermen versions where all are extinct
     n_popped = 0
-    for idx in extinct_fishers:
-        population_counter.pop(idx - n_popped)
-        population.pop(idx - n_popped)
-        n_popped += 1
-          
-    population, population_counter = mutate_population(population, population_counter)
+    for i, fisher in enumerate(population):
+        if fisher in extinct_fishers:
+            population.pop(i - n_popped)
+            n_popped += 1
+
+    population = mutate_population(population)
 
     return population, population_counter
 
 
 
-def mutate_population(population, population_counter, mutation_rate=5e-2):
-    
-    # create new mutated fishermen
-    new_fishers = []
-    for idx, fisher in enumerate(population):
-        if random() < mutation_rate:
-            mutated_fisher = Fisherman()
-            mutated_fisher.effort = fisher.effort + np.random.normal()
-            new_fishers.append(mutated_fisher)
-    
-    if len(new_fishers) > 0:
-        # add new fishermen to population
-        population += new_fishers
-        population_counter += [1 for ii in new_fishers]
+def mutate_population(population, mutation_rate=5e-2):
+    sigma = 1.0
+    for fisher in population:
+        if random.random() < mutation_rate:
+            fisher.gene[0] += np.round(sigma * np.random.randn(), 2)
+        if random.random() < mutation_rate:
+            fisher.gene[1] += np.round(sigma * np.random.randn(), 2)
 
-        # sort the population in ascending effort order
-        # idx_effort_order = np.argsort([fisher.effort for fisher in population])
-        # population = [population[ii] for ii in idx_effort_order]
-        # population_counter = [population_counter[ii] for ii in idx_effort_order]
-
-    return population, population_counter
+    return population
 
 if __name__ == '__main__':
         population_size = 20
