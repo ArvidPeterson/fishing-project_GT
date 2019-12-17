@@ -24,7 +24,7 @@ def stable_solution(list_of_fishers, fish_stock):
 
     return stable_effort_all_players
 
-
+# TODO: maybe change this to a class?
 def go_fishing(nbr_players, max_time, effort_of_round=[], list_of_fishers=[]):
     # Assume same effort for all players
 
@@ -37,7 +37,7 @@ def go_fishing(nbr_players, max_time, effort_of_round=[], list_of_fishers=[]):
         list_of_fishers = [Fisherman(effort=effort_of_round[i]) for i in range(nbr_players)]
 
     fish_stock = FishStock()
-    fish_stock.X = 5000
+    fish_stock.X = 50
 
     harvest_array = np.zeros([max_time, nbr_players])
     fish_stock_array = np.zeros([max_time])
