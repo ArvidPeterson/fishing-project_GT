@@ -7,6 +7,7 @@ class FishStock:
         self.growth_rate = 0.1
         self.catch_coeff = 0.01
         self.X = init_stock_size
+        self.X_history = []
 
     def fish_stock_change(self, list_of_fishers):
         sum_of_harvest = 0
