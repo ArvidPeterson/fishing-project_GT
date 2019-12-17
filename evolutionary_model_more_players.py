@@ -31,24 +31,21 @@ def evolutionary_dynamics(init_population_size,
                                                                                     # of individuals of each genotype
     # init fish stock
     stock = FishStock(init_stock_size=5000)
-    # plot_histogram(population, population_counter, 0)
-    stock_size_array = np.zeros(n_generations)
+    stock.X_history.append(stock.X)
 
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_counter):
             import pdb; pdb.set_trace()
             raise Exception('population and population_counter inconsistent')
-        # population size can vary in time as new genes emerge
-        population_size = len(population) # not equal to the number of individuals more like n_species 
-        profits = np.zeros(population_size)
 
-        
         # update efforts depending on others effort at t-1
         update_effort(stock=stock, list_of_fishers=population)
         
         # update harvest for every fisher and change stock size
         stock.fish_stock_change(population)
+        stock.X_history.append(stock.X)
+
         if stock.X < 1.0:
             print(f'Stock depleated at {t}')
             break
@@ -61,9 +58,8 @@ def evolutionary_dynamics(init_population_size,
             pass
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
-        stock_size_array[t] = stock.X
-        # import pdb; pdb.set_trace()
-        plot_histogram(population, population_counter, t, stock_size_array[0:t])
+
+        plot_histogram(population, population_counter, t, stock)
     print('done')
 
 def calc_new_population(profits, population, population_counter, mutation_rate=1e-2):

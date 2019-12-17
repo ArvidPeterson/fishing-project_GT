@@ -35,10 +35,12 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_xlim([0, max(max(score), 20)])
     plt.draw()
 
+    fig = plt.figure(2)
+
     fig = plt.figure(3)
     fig.clf()
     ax = fig.gca()
-    ax.plot(stock, color='b')
+    ax.plot(stock.X_history, color='b')
     ax.set_title('Stock size at time ' + str(generation + 1))
     ax.set_xlabel('time')
     ax.set_ylabel('stock size')
@@ -46,6 +48,4 @@ def plot_histogram(population, population_counter, generation, stock):
     plt.draw()
 
     plt.pause(0.01)
-    max_effort = max(effort_in_pop)
-    player_with_max_effort = np.argmax(effort_in_pop)
 
