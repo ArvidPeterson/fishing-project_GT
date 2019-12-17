@@ -31,7 +31,8 @@ def evolutionary_dynamics(init_population_size,
     # init fish stock
     stock = FishStock(init_stock_size=5000)
     # plot_histogram(population, population_counter, 0)
-    
+    stock_size_array = np.zeros(n_generations)
+
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_counter):
@@ -58,7 +59,8 @@ def evolutionary_dynamics(init_population_size,
             pass
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
-        plot_histogram(population, population_counter, t)
+        stock_size_array[t] = stock.X
+        plot_histogram(population, population_counter, t, stock_size_array[0:t])
     print('done')
 
 def calc_new_population(profits, population, population_counter, mutation_rate=1e-2):
@@ -100,7 +102,7 @@ def mutate_population(population, mutation_rate=5e-2):
     return population
 
 if __name__ == '__main__':
-        population_size = 20
+        population_size = 10
         initialize_plot()
         evolutionary_dynamics(population_size)
         plt.show()
