@@ -7,8 +7,8 @@ def initialize_plot():
     plt.xlabel('Effort')
 
     plt.figure(num=2, figsize=(5, 5))
-    plt.ylabel('Frequency')
-    plt.xlabel('Effort')
+    plt.ylabel('b')
+    plt.xlabel('a')
 
     plt.figure(num=3, figsize=(5, 5))
     plt.ylabel('Stock size')
@@ -28,20 +28,32 @@ def plot_histogram(population, population_counter, generation, stock):
     fig.clf()
     ax = fig.gca()
     ax.bar(score, effort_in_pop, color='b')
-    ax.set_title('Time '+ str(generation+1))
+    ax.set_title(f'Time {generation+1} nof species {len(population)}')
     ax.set_xlabel('score')
     ax.set_ylabel('effort')
     # ax.set_xticks(effort_in_pop)
     ax.set_xlim([0, max(max(score), 20)])
     plt.draw()
 
+
+    a_vec = [f.gene[0] for f in population]
+    b_vec = [f.gene[1] for f in population]
+    
     fig = plt.figure(2)
+    fig.clf()
+    ax = fig.gca()
+    ax.scatter(a_vec, b_vec)
+    ax.set_xlabel('a')
+    ax.set_ylabel('b')
+    ax.set_title('Gene config')
+    plt.draw()
+
 
     fig = plt.figure(3)
     fig.clf()
     ax = fig.gca()
     ax.plot(stock.X_history, color='b')
-    ax.set_title('Stock size at time ' + str(generation + 1))
+    ax.set_title(f'Fish stock size')
     ax.set_xlabel('time')
     ax.set_ylabel('stock size')
     ax.set_ylim(0, 5000)
