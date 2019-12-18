@@ -33,6 +33,7 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_ylabel('effort')
     # ax.set_xticks(effort_in_pop)
     ax.set_xlim([0, max(max(score), 20)])
+    ax.set_ylim([0, 5])
     plt.draw()
 
 
@@ -46,6 +47,8 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_xlabel('a')
     ax.set_ylabel('b')
     ax.set_title('Gene config')
+    ax.set_xlim([-3,3])
+    ax.set_ylim([-3,3])
     plt.draw()
 
 

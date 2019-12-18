@@ -10,7 +10,7 @@ import random
 import sys
 import copy
 
-INIT_POP_NUMBER = 100
+INIT_POP_FITNESS = 100
 
 def evolutionary_dynamics(population_size, 
                         mutation_rate=1e-2, 
@@ -30,7 +30,7 @@ def evolutionary_dynamics(population_size,
     genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(population_size)]
     # init population
     population = [Fisherman(gene=genes[i]) for i in range(population_size)]
-    population_fitness = {population[ii]:INIT_POP_NUMBER for ii in range(population_size)}# keeps track of the number
+    population_fitness = {population[ii]:INIT_POP_FITNESS for ii in range(population_size)}# keeps track of the number
                                                                                     # of individuals of each genotype
     # init fish stock
     stock = FishStock(init_stock_size=5000)
@@ -57,7 +57,7 @@ def evolutionary_dynamics(population_size,
         
         # calculate profit
         profits = [fisher.calculate_profit() for fisher in population]
-        population, population_fitness = calc_new_population(profits, population, population_fitness, stock)
+        population, population_fitness = calc_new_population(profits, population, population_fitness, stock, effort_resolution)
         if len(population) < 2:
             import pdb; pdb.set_trace()
             pass
@@ -67,12 +67,12 @@ def evolutionary_dynamics(population_size,
         plot_histogram(population, population_fitness, t, stock)
     print('done')
 
-def calc_new_population(profits, population, population_fitness, stock, mutation_rate=1e-2):
+def calc_new_population(profits, population, population_fitness, stock, effort_resolution, mutation_rate=1e-2):
 
     scaling_factor = 0.1
-    
+    sigma = 0.5
+
     nbr_players = len(population)
-    extinct_fishers = []
     profits_mean = np.mean(profits)
 
     for i, fisher in enumerate(population):
@@ -80,21 +80,30 @@ def calc_new_population(profits, population, population_fitness, stock, mutation
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean)+scaling_factor*steady_all_fisher_i)
         fisher.population_history.append(population_fitness[fisher])
-        # if population_fitness[fisher] < 1:
-        #     del population_fitness[fisher]
-        #     extinct_fishers.append(fisher)
-    
-    n_popped = 0
-    # for fisher in extinct_fishers:
-    #     population.remove(fisher)
 
     
+    
+    p = max(len(population)//10, 1)
+    pop_fitness_list = [population_fitness[fisher] for fisher in population]
+    mean_fitness = np.mean(pop_fitness_list)
+    fitness_sort_idx = np.argsort(pop_fitness_list)
+    
+    for idx in range(p):
+        good_fisher = copy.deepcopy(population[fitness_sort_idx[p]])
+        good_fisher.gene[0] += np.round(sigma * np.random.randn(), effort_resolution)
+        good_fisher.gene[1] += np.round(sigma * np.random.randn(), effort_resolution)
+        population_fitness[good_fisher] = population_fitness[population[p]]
+
+        shit_fisher = population[fitness_sort_idx[-(p + 1)]]
+        del population_fitness[shit_fisher]
+        population.remove(shit_fisher)
+        population.append(good_fisher)
 
     if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
         raise Exception('population and population_fitness inconsistent')
 
-    population, population_fitness = mutate_population(population, population_fitness)
+    # population, population_fitness = mutate_population(population, population_fitness)
 
     return population, population_fitness
 
@@ -113,11 +122,11 @@ def mutate_population(population, population_fitness, mutation_rate=1e-2):
 
     population += new_fishers
     for fisher in new_fishers:
-        population_fitness[fisher] = INIT_POP_NUMBER
+        population_fitness[fisher] = INIT_POP_FITNESS
     return population, population_fitness
 
 if __name__ == '__main__':
-        population_size = 10
+        population_size = 50
         initialize_plot()
         evolutionary_dynamics(population_size)
         plt.show()
