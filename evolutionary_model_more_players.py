@@ -12,7 +12,7 @@ import copy
 
 INIT_POP_NUMBER = 100
 
-def evolutionary_dynamics(init_population_size, 
+def evolutionary_dynamics(population_size, 
                         mutation_rate=1e-2, 
                         t_max=500, 
                         n_generations = 1000,
@@ -22,15 +22,15 @@ def evolutionary_dynamics(init_population_size,
     effort_max = 14.0
     effort_min = 0.0
     effort_resolution = 2
-    step_size = (effort_max - effort_min) / init_population_size
-    efforts = [step_size * ii for ii in range(init_population_size)]
+    step_size = (effort_max - effort_min) / population_size
+    efforts = [step_size * ii for ii in range(population_size)]
     efforts = np.round(efforts, effort_resolution)
-    base_effort = 1.0 / init_population_size
+    base_effort = 1.0 / population_size
     
-    genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(init_population_size)]
+    genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(population_size)]
     # init population
-    population = [Fisherman(gene=genes[i]) for i in range(init_population_size)]
-    population_fitness = {population[ii]:INIT_POP_NUMBER for ii in range(init_population_size)}# keeps track of the number
+    population = [Fisherman(gene=genes[i]) for i in range(population_size)]
+    population_fitness = {population[ii]:INIT_POP_NUMBER for ii in range(population_size)}# keeps track of the number
                                                                                     # of individuals of each genotype
     # init fish stock
     stock = FishStock(init_stock_size=5000)
@@ -80,13 +80,15 @@ def calc_new_population(profits, population, population_fitness, stock, mutation
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean)+scaling_factor*steady_all_fisher_i)
         fisher.population_history.append(population_fitness[fisher])
-        if population_fitness[fisher] < 1:
-            del population_fitness[fisher]
-            extinct_fishers.append(fisher)
+        # if population_fitness[fisher] < 1:
+        #     del population_fitness[fisher]
+        #     extinct_fishers.append(fisher)
     
     n_popped = 0
-    for fisher in extinct_fishers:
-        population.remove(fisher)
+    # for fisher in extinct_fishers:
+    #     population.remove(fisher)
+
+    
 
     if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
