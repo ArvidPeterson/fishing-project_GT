@@ -57,7 +57,7 @@ def evolutionary_dynamics(init_population_size,
         
         # calculate profit
         profits = [fisher.calculate_profit() for fisher in population]
-        population, population_fitness = calc_new_population(profits, population, population_fitness)
+        population, population_fitness = calc_new_population(profits, population, population_fitness, stock)
         if len(population) < 2:
             import pdb; pdb.set_trace()
             pass
@@ -67,17 +67,18 @@ def evolutionary_dynamics(init_population_size,
         plot_histogram(population, population_fitness, t, stock)
     print('done')
 
-def calc_new_population(profits, population, population_fitness, mutation_rate=1e-2):
+def calc_new_population(profits, population, population_fitness, stock, mutation_rate=1e-2):
 
     scaling_factor = 0.1
     
-
+    nbr_players = len(population)
     extinct_fishers = []
     profits_mean = np.mean(profits)
 
     for i, fisher in enumerate(population):
-
-        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean))
+        # calculate steady state if all players played like fisher i
+        steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
+        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean)+scaling_factor*steady_all_fisher_i)
         fisher.population_history.append(population_fitness[fisher])
         if population_fitness[fisher] < 1:
             del population_fitness[fisher]
