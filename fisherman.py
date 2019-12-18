@@ -3,8 +3,8 @@ class Fisherman():
     def __init__(self, gene = [0.0, 0.0]):
         self.gene = gene
         self.effort = self.gene[0]
-        self.price_per_harvest = 5
-        self.cost_per_effort = 10
+        self.price_per_harvest = 20
+        self.cost_per_effort = 5
         self.harvest = 0
         self.profit = 0
         self.population_history = []
@@ -12,7 +12,7 @@ class Fisherman():
         self.gene_history = []
 
     def calculate_profit(self):
-        
+        print(f'HARVEST = {self.harvest}')
         self.profit = self.price_per_harvest*self.harvest - self.cost_per_effort*self.effort
         self.profit_history.append(self.profit)
         self.gene_history.append(self.gene)

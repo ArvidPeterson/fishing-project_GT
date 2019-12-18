@@ -48,7 +48,7 @@ def evolutionary_dynamics(population_size,
             population_fitness[fisher] += -1
         
         # update harvest for every fisher and change stock size
-        stock.fish_stock_change(population)
+        stock.fish_stock_change_update_fisher_harvest(population)
         stock.X_history.append(stock.X)
 
         if stock.X < 1.0:
@@ -70,7 +70,7 @@ def evolutionary_dynamics(population_size,
 def calc_new_population(profits, population, population_fitness, stock, effort_resolution, mutation_rate=1e-2):
 
     scaling_factor = 0.1
-    sigma = 0.5
+    sigma = 0.1
 
     nbr_players = len(population)
     profits_mean = np.mean(profits)
@@ -79,7 +79,7 @@ def calc_new_population(profits, population, population_fitness, stock, effort_r
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
-                                          (scaling_factor*min(steady_all_fisher_i, 0)))
+                                          (0.5*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
 
     
@@ -90,15 +90,20 @@ def calc_new_population(profits, population, population_fitness, stock, effort_r
     fitness_sort_idx = np.argsort(pop_fitness_list)
     
     for idx in range(p):
-        good_fisher = copy.deepcopy(population[fitness_sort_idx[p]])
+        good_fisher = copy.deepcopy(population[fitness_sort_idx[-(idx + 1)]])
         good_fisher.gene[0] += np.round(sigma * np.random.randn(), effort_resolution)
         good_fisher.gene[1] += np.round(sigma * np.random.randn(), effort_resolution)
-        population_fitness[good_fisher] = population_fitness[population[p]]
+        population_fitness[good_fisher] = population_fitness[population[idx]]
 
-        shit_fisher = population[fitness_sort_idx[-(p + 1)]]
+        shit_fisher = population[fitness_sort_idx[idx]]
         del population_fitness[shit_fisher]
         population.remove(shit_fisher)
         population.append(good_fisher)
+    
+    for idx in range(p, nbr_players - p):
+        if np.random.random() < mutation_rate:
+            population[idx].gene[0] += np.round(sigma*np.random.randn(), effort_resolution)
+            population[idx].gene[1] += np.round(sigma*np.random.randn(), effort_resolution)
 
     if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
@@ -127,7 +132,7 @@ def mutate_population(population, population_fitness, mutation_rate=1e-2):
     return population, population_fitness
 
 if __name__ == '__main__':
-        population_size = 50
+        population_size = 20
         initialize_plot()
         evolutionary_dynamics(population_size)
         plt.show()
