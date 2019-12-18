@@ -21,8 +21,9 @@ class Fisherman():
     def update_effort(self, E_bar, n_players=None):
 
         if n_players:
-            E_bar = (E_bar*n_players - self.effort)/(n_players - 1)
-            
+            if n_players > 1:
+                E_bar = (E_bar*n_players - self.effort)/(n_players - 1)
+
         self.effort = max(self.gene[0] + self.gene[1]*E_bar, 0)
         self.effort = min(5.0, self.effort)
 

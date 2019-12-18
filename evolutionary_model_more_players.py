@@ -78,12 +78,13 @@ def calc_new_population(profits, population, population_fitness, stock, mutation
     for i, fisher in enumerate(population):
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
-        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean)+scaling_factor*steady_all_fisher_i)
+        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
+                                          (scaling_factor*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
         if population_fitness[fisher] < 1:
             del population_fitness[fisher]
             extinct_fishers.append(fisher)
-    
+
     n_popped = 0
     for fisher in extinct_fishers:
         population.remove(fisher)
