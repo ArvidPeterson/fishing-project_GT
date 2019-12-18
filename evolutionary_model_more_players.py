@@ -30,7 +30,7 @@ def evolutionary_dynamics(init_population_size,
     genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(init_population_size)]
     # init population
     population = [Fisherman(gene=genes[i]) for i in range(init_population_size)]
-    population_counter = {population[ii]:INIT_POP_NUMBER for ii in range(init_population_size)}# keeps track of the number
+    population_fitness = {population[ii]:INIT_POP_NUMBER for ii in range(init_population_size)}# keeps track of the number
                                                                                     # of individuals of each genotype
     # init fish stock
     stock = FishStock(init_stock_size=5000)
@@ -38,14 +38,14 @@ def evolutionary_dynamics(init_population_size,
 
     for t in range(n_generations):
         # check that population and counter is consistent
-        if len(population) != len(population_counter):
+        if len(population) != len(population_fitness):
             import pdb; pdb.set_trace()
-            raise Exception('population and population_counter inconsistent')
+            raise Exception('population and population_fitness inconsistent')
 
         # update efforts depending on others effort at t-1
         update_effort(stock=stock, list_of_fishers=population)
         for fisher in population:
-            population_counter[fisher] += -1
+            population_fitness[fisher] += -1
         
         # update harvest for every fisher and change stock size
         stock.fish_stock_change(population)
@@ -57,17 +57,17 @@ def evolutionary_dynamics(init_population_size,
         
         # calculate profit
         profits = [fisher.calculate_profit() for fisher in population]
-        population, population_counter = calc_new_population(profits, population, population_counter)
+        population, population_fitness = calc_new_population(profits, population, population_fitness)
         if len(population) < 2:
             import pdb; pdb.set_trace()
             pass
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
 
-        plot_histogram(population, population_counter, t, stock)
+        plot_histogram(population, population_fitness, t, stock)
     print('done')
 
-def calc_new_population(profits, population, population_counter, mutation_rate=1e-2):
+def calc_new_population(profits, population, population_fitness, mutation_rate=1e-2):
 
     scaling_factor = 0.1
     
@@ -77,27 +77,27 @@ def calc_new_population(profits, population, population_counter, mutation_rate=1
 
     for i, fisher in enumerate(population):
 
-        population_counter[fisher] += int(scaling_factor*(fisher.profit - profits_mean))
-        fisher.population_history.append(population_counter[fisher])
-        if population_counter[fisher] < 1:
-            del population_counter[fisher]
+        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean))
+        fisher.population_history.append(population_fitness[fisher])
+        if population_fitness[fisher] < 1:
+            del population_fitness[fisher]
             extinct_fishers.append(fisher)
     
     n_popped = 0
     for fisher in extinct_fishers:
         population.remove(fisher)
 
-    if len(population) != len(population_counter):
+    if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
-        raise Exception('population and population_counter inconsistent')
+        raise Exception('population and population_fitness inconsistent')
 
-    population, population_counter = mutate_population(population, population_counter)
+    population, population_fitness = mutate_population(population, population_fitness)
 
-    return population, population_counter
+    return population, population_fitness
 
 
 
-def mutate_population(population, population_counter, mutation_rate=1e-2):
+def mutate_population(population, population_fitness, mutation_rate=1e-2):
     sigma = 0.5
     new_fishers = []
     for fisher in population:
@@ -110,8 +110,8 @@ def mutate_population(population, population_counter, mutation_rate=1e-2):
 
     population += new_fishers
     for fisher in new_fishers:
-        population_counter[fisher] = INIT_POP_NUMBER
-    return population, population_counter
+        population_fitness[fisher] = INIT_POP_NUMBER
+    return population, population_fitness
 
 if __name__ == '__main__':
         population_size = 10
