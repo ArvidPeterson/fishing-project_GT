@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from simulation_config import *
+
 
 def initialize_plot():
     plt.figure(num=1, figsize=(5, 5))
@@ -29,14 +31,14 @@ def plot_histogram(population, population_counter, generation, stock):
     ax = fig.gca()
     ax.bar(score, effort_in_pop, color='b')
     ax.set_title(f'Time {generation+1} nof species {len(population)}')
-    ax.set_xlabel('score')
+    ax.set_xlabel('player')
     ax.set_ylabel('effort')
     # ax.set_xticks(effort_in_pop)
     ax.set_xlim([0, max(max(score), 20)])
     ax.set_ylim([0, 5])
     plt.draw()
 
-
+    # scatterplot of genes in population
     a_vec = [f.gene[0] for f in population]
     b_vec = [f.gene[1] for f in population]
     
@@ -49,9 +51,10 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_title('Gene config')
     ax.set_xlim([-3,3])
     ax.set_ylim([-3,3])
+    plt.grid(True)
     plt.draw()
 
-
+    # time plot over fish stock size
     fig = plt.figure(3)
     fig.clf()
     ax = fig.gca()
@@ -59,7 +62,7 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_title(f'Fish stock size')
     ax.set_xlabel('time')
     ax.set_ylabel('stock size')
-    ax.set_ylim(0, 5000)
+    ax.set_ylim(0, CARRYING_CAP)
     plt.draw()
 
     plt.pause(0.01)

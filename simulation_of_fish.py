@@ -29,7 +29,8 @@ def update_effort(stock, list_of_fishers):
 
     nbr_fishers = len(list_of_fishers)
     total_effort = sum([fisher.effort for fisher in list_of_fishers])   
-    effort_bar = total_effort/nbr_fishers
+    # effort_bar = total_effort/nbr_fishers
+    effort_bar = np.median([fisher.effort for fisher in list_of_fishers])
     
     # calculate effort for every player and calculate profit
     for fisher in list_of_fishers:

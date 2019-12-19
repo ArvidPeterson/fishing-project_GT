@@ -2,6 +2,7 @@ from fisherman import *
 from fish_stock import *
 from simulation_of_fish import update_effort
 from plot_functions import *
+from simulation_config import *
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,24 +11,23 @@ import random
 import sys
 import copy
 
-INIT_POP_FITNESS = 100
+
 
 def evolutionary_dynamics(population_size, 
-                        mutation_rate=1e-2, 
-                        t_max=500, 
-                        n_generations = 1000,
+                        mutation_rate=MUTATION_RATE, 
+                        #t_max=500, 
+                        n_generations = MAX_SIM_TIME,
                         crossover=False):
 
-    
-    effort_max = 14.0
-    effort_min = 0.0
+    effort_max = EFFORT_MAX
+    effort_min = EFFORT_MIN
     effort_resolution = 2
     step_size = (effort_max - effort_min) / population_size
     efforts = [step_size * ii for ii in range(population_size)]
     efforts = np.round(efforts, effort_resolution)
     base_effort = 1.0 / population_size
     
-    genes = [[base_effort, np.round(np.random.randn(), effort_resolution)] for ii in range(population_size)]
+    genes = [[(np.random.rand() - 0.5) * 6, (np.random.rand() - 0.5) * 6] for ii in range(population_size)]
     # init population
     population = [Fisherman(gene=genes[i]) for i in range(population_size)]
     population_fitness = {population[ii]:INIT_POP_FITNESS for ii in range(population_size)}# keeps track of the number
@@ -67,10 +67,11 @@ def evolutionary_dynamics(population_size,
         plot_histogram(population, population_fitness, t, stock)
     print('done')
 
-def calc_new_population(profits, population, population_fitness, stock, effort_resolution, mutation_rate=1e-2):
+def calc_new_population(profits, population, population_fitness, 
+            stock, effort_resolution, mutation_rate=MUTATION_RATE):
 
-    scaling_factor = 0.1
-    sigma = 0.1
+    scaling_factor = POPULATION_SCALING_FACTOR
+    sigma = MUTATION_VARIANCE
 
     nbr_players = len(population)
     profits_mean = np.mean(profits)
@@ -79,7 +80,7 @@ def calc_new_population(profits, population, population_fitness, stock, effort_r
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
-                                          (0.5*min(steady_all_fisher_i, 0)))
+                                          (0.2*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
 
     
@@ -102,8 +103,8 @@ def calc_new_population(profits, population, population_fitness, stock, effort_r
     
     for idx in range(p, nbr_players - p):
         if np.random.random() < mutation_rate:
-            population[idx].gene[0] += np.round(sigma*np.random.randn(), effort_resolution)
-            population[idx].gene[1] += np.round(sigma*np.random.randn(), effort_resolution)
+            population[idx].gene[0] += np.round(sigma * np.random.randn(), effort_resolution)
+            population[idx].gene[1] += np.round(sigma * np.random.randn(), effort_resolution)
 
     if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
@@ -115,7 +116,7 @@ def calc_new_population(profits, population, population_fitness, stock, effort_r
 
 
 
-def mutate_population(population, population_fitness, mutation_rate=1e-2):
+def mutate_population(population, population_fitness, mutation_rate=MUTATION_RATE):
     sigma = 0.5
     new_fishers = []
     for fisher in population:
@@ -132,8 +133,8 @@ def mutate_population(population, population_fitness, mutation_rate=1e-2):
     return population, population_fitness
 
 if __name__ == '__main__':
-        population_size = 20
+        
         initialize_plot()
-        evolutionary_dynamics(population_size)
+        evolutionary_dynamics(POPULATION_SIZE)
         plt.show()
 

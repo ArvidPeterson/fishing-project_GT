@@ -1,12 +1,14 @@
+from simulation_config import *
+
 class FishStock:
 
     def __init__(self, init_stock_size=0):
 
         # Todo: Set reasonable parameter values
-        self.carrying_cap = 5000
-        self.growth_rate = 0.1
-        self.catch_coeff = 0.01
-        self.X = init_stock_size
+        self.carrying_cap = CARRYING_CAP
+        self.growth_rate = GROWTH_RATE
+        self.catch_coeff = CATCH_COEFF
+        self.X = CARRYING_CAP
         self.X_history = []
 
     def fish_stock_change_update_fisher_harvest(self, list_of_fishers):
