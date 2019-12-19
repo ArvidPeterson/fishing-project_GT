@@ -1,7 +1,7 @@
 from fisherman import *
 from fish_stock import *
 from simulation_of_fish import update_effort
-from plot_functions import *
+from plot_functions import plot_histogram, close_all_figure_windows, initialize_plot
 from simulation_config import *
 
 import numpy as np
@@ -13,29 +13,31 @@ import copy
 
 
 
-def evolutionary_dynamics(population_size, 
+def evolutionary_dynamics(population = [],
+                        population_size = POPULATION_SIZE, 
                         mutation_rate=MUTATION_RATE, 
-                        #t_max=500, 
                         n_generations = MAX_SIM_TIME,
                         crossover=False):
 
-    effort_max = EFFORT_MAX
-    effort_min = EFFORT_MIN
     effort_resolution = 2
-    step_size = (effort_max - effort_min) / population_size
-    efforts = [step_size * ii for ii in range(population_size)]
-    efforts = np.round(efforts, effort_resolution)
-    base_effort = 1.0 / population_size
+    # init population if population not provided
+    if len(population) < 1:
+        effort_max = EFFORT_MAX
+        effort_min = EFFORT_MIN
+        step_size = (effort_max - effort_min) / population_size
+        efforts = [step_size * ii for ii in range(population_size)]
+        efforts = np.round(efforts, effort_resolution)
+        base_effort = 1.0 / population_size
+        
+        genes = [[(np.random.rand() - 0.5) * 1, (np.random.rand() - 0.5) * 1] for ii in range(population_size)]
+        population = [Fisherman(gene=genes[i]) for i in range(population_size)]
     
-    genes = [[(np.random.rand() - 0.5) * 6, (np.random.rand() - 0.5) * 6] for ii in range(population_size)]
-    # init population
-    population = [Fisherman(gene=genes[i]) for i in range(population_size)]
     population_fitness = {population[ii]:INIT_POP_FITNESS for ii in range(population_size)}# keeps track of the number
                                                                                     # of individuals of each genotype
     # init fish stock
     stock = FishStock(init_stock_size=5000)
     stock.X_history.append(stock.X)
-
+    depletion_time = 0
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_fitness):
@@ -65,7 +67,9 @@ def evolutionary_dynamics(population_size,
         sys.stdout.flush()
 
         plot_histogram(population, population_fitness, t, stock)
-    print('done')
+        depletion_time = t
+    close_all_figure_windows()
+    return population, population_fitness, depletion_time
 
 def calc_new_population(profits, population, population_fitness, 
             stock, effort_resolution, mutation_rate=MUTATION_RATE):
@@ -79,8 +83,9 @@ def calc_new_population(profits, population, population_fitness,
     for i, fisher in enumerate(population):
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
-        population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
-                                          (0.2*min(steady_all_fisher_i, 0)))
+        # import pdb; pdb.set_trace()
+        population_fitness[fisher] += scaling_factor*((fisher.profit - profits_mean) + 
+                (1 - IS_REPEATED_GAME) * (0.2*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
 
     

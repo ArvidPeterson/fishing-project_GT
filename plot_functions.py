@@ -2,23 +2,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from simulation_config import *
 
+# figure numbers
+i_gene_plot = 2
+i_bar_plot = 0
+i_fish_plot = 1
 
 def initialize_plot():
-    plt.figure(num=1, figsize=(5, 5))
+    plt.figure(num=i_bar_plot, figsize=(5, 5))
     plt.ylabel('Frequency')
     plt.xlabel('Effort')
 
-    plt.figure(num=2, figsize=(5, 5))
-    plt.ylabel('b')
-    plt.xlabel('a')
 
-    plt.figure(num=3, figsize=(5, 5))
+    plt.figure(num=i_fish_plot, figsize=(5, 5))
     plt.ylabel('Stock size')
     plt.xlabel('time')
 
-def plot_histogram(population, population_counter, generation, stock):
+    plt.figure(num=i_gene_plot, figsize=(5, 5))
+    plt.ylabel('b')
+    plt.xlabel('a')
 
-    # make list of efforts
+def plot_histogram(population, population_counter, generation, stock):
+    # make list of efforts  
     effort_in_pop = []
     score = []
     for i, fisher in enumerate(population):
@@ -26,7 +30,7 @@ def plot_histogram(population, population_counter, generation, stock):
         score.append(i)
 
     # plot histogram
-    fig = plt.figure(1)
+    fig = plt.figure(i_bar_plot)
     fig.clf()
     ax = fig.gca()
     ax.bar(score, effort_in_pop, color='b')
@@ -38,11 +42,22 @@ def plot_histogram(population, population_counter, generation, stock):
     ax.set_ylim([0, 5])
     plt.draw()
 
+    # time plot over fish stock size
+    fig = plt.figure(i_fish_plot)
+    fig.clf()
+    ax = fig.gca()
+    ax.plot(stock.X_history, color='b')
+    ax.set_title(f'Fish stock size')
+    ax.set_xlabel('time')
+    ax.set_ylabel('stock size')
+    ax.set_ylim(0, CARRYING_CAP)
+    plt.draw()
+
     # scatterplot of genes in population
     a_vec = [f.gene[0] for f in population]
     b_vec = [f.gene[1] for f in population]
     
-    fig = plt.figure(2)
+    fig = plt.figure(i_gene_plot)
     fig.clf()
     ax = fig.gca()
     ax.scatter(a_vec, b_vec)
@@ -54,16 +69,9 @@ def plot_histogram(population, population_counter, generation, stock):
     plt.grid(True)
     plt.draw()
 
-    # time plot over fish stock size
-    fig = plt.figure(3)
-    fig.clf()
-    ax = fig.gca()
-    ax.plot(stock.X_history, color='b')
-    ax.set_title(f'Fish stock size')
-    ax.set_xlabel('time')
-    ax.set_ylabel('stock size')
-    ax.set_ylim(0, CARRYING_CAP)
-    plt.draw()
+    plt.pause(1e-5)
 
-    plt.pause(0.01)
-
+def close_all_figure_windows():
+    # for ii in range(3):
+    #     fig = plt.figure(2)
+    plt.close('all')

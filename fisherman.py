@@ -20,7 +20,7 @@ class Fisherman():
         self.gene_history.append(self.gene)
         return self.profit
     
-    def update_effort(self, E_bar, n_players=None):
+    def update_fishers_effort(self, E_bar, n_players=None):
 
         if n_players:
             if n_players > 1:
@@ -28,5 +28,7 @@ class Fisherman():
 
         self.effort = max(self.gene[0] + self.gene[1]*E_bar, 0)
         self.effort = min(5.0, self.effort)
-
+        
+        # self.effort = self.gene[0] + self.gene[1]*E_bar
+        # self.effort = self.effort
 

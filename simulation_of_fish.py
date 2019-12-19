@@ -36,7 +36,7 @@ def update_effort(stock, list_of_fishers):
     for fisher in list_of_fishers:
         # effort_bar_fisher = (effort_bar*nbr_fishers-fisher.effort)/(nbr_fishers-1)
         # fisher.effort = fisher.gene[0]+fisher.gene[1]*effort_bar_fisher
-        fisher.update_effort(E_bar=effort_bar, n_players=len(list_of_fishers))
+        fisher.update_fishers_effort(E_bar=effort_bar, n_players=len(list_of_fishers))
 
 
 def main():
