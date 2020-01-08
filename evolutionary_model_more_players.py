@@ -65,6 +65,8 @@ def evolutionary_dynamics(population_size,
         sys.stdout.flush()
 
         plot_histogram(population, population_fitness, t, stock)
+
+    summation_of_profit(population)
     print('done')
 
 def calc_new_population(profits, population, population_fitness, 
@@ -80,7 +82,7 @@ def calc_new_population(profits, population, population_fitness,
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
-                                          (0.2*min(steady_all_fisher_i, 0)))
+                                          (0.01*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
 
     
@@ -131,6 +133,29 @@ def mutate_population(population, population_fitness, mutation_rate=MUTATION_RAT
     for fisher in new_fishers:
         population_fitness[fisher] = INIT_POP_FITNESS
     return population, population_fitness
+
+
+def summation_of_profit(population):
+
+    mean_profit_all_fishers = np.zeros(len(population))
+    plt.figure(num=4, figsize=(5, 5))
+    plt.ylabel('b')
+    plt.xlabel('a')
+
+    for i, fisher in enumerate(population):
+        if len(fisher.profit_history) > 500: # take away transient
+            mean_profit_all_fishers[i] = sum(fisher.profit_history[-500:])/len(fisher.profit_history[-500:])
+        else:
+            mean_profit_all_fishers[i] = sum(fisher.profit_history) / len(fisher.profit_history)
+        print(f'{i}: Gene \t {fisher.gene}, Mean profit: {mean_profit_all_fishers[i]}')
+
+    mean_profit = np.mean(mean_profit_all_fishers)
+    for fisher in population:
+        plt.scatter(fisher.gene[0], fisher.gene[1], s=0.2*mean_profit_all_fishers[i], color='b', alpha=0.5)
+
+    best_fisher = population[np.argmax(mean_profit_all_fishers)]
+    print(mean_profit_all_fishers)
+    import pdb; pdb.set_trace()
 
 if __name__ == '__main__':
         

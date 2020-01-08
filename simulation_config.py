@@ -2,7 +2,7 @@
 # file have convenient way of setting hyperparameters
     
 # Simulation loop
-POPULATION_SIZE = 50
+POPULATION_SIZE = 20
 INIT_POP_FITNESS = 100
 MAX_SIM_TIME = 1000
 MUTATION_RATE = 1e-2
@@ -12,8 +12,8 @@ MUTATION_VARIANCE = 0.5
 POPULATION_SCALING_FACTOR = 0.1
 
 # fisherman class
-PRICE_PER_HARVEST = 20
-COST_PER_EFFORT =1
+PRICE_PER_HARVEST = 5
+COST_PER_EFFORT = 3
 
 
 # fish stock
