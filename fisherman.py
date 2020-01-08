@@ -13,7 +13,7 @@ class Fisherman():
         self.profit_history = []
         self.gene_history = []
 
-    def calculate_profit(self):
+    def calculate_and_set_profit(self):
         # print(f'HARVEST = {self.harvest}')
         self.profit = self.price_per_harvest*self.harvest - self.cost_per_effort*self.effort
         self.profit_history.append(self.profit)

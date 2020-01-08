@@ -27,8 +27,8 @@ def init_population():
     effort_min = EFFORT_MIN
     effort_resolution = 2
     step_size = (effort_max - effort_min) / POPULATION_SIZE
-    efforts = [step_size * ii for ii in range(POPULATION_SIZE)]
-    efforts = np.round(efforts, effort_resolution)
+    # efforts = [step_size * ii for ii in range(POPULATION_SIZE)]
+    # efforts = np.round(efforts, effort_resolution)
     # base_effort = 1.0 / POPULATION_SIZE
     
     genes = [[(np.random.rand() - 0.5) * 6, (np.random.rand() - 0.5) * 6] for ii in range(POPULATION_SIZE)]

@@ -25,9 +25,9 @@ def evolutionary_dynamics(population = [],
         effort_max = EFFORT_MAX
         effort_min = EFFORT_MIN
         step_size = (effort_max - effort_min) / population_size
-        efforts = [step_size * ii for ii in range(population_size)]
-        efforts = np.round(efforts, effort_resolution)
-        base_effort = 1.0 / population_size
+        # efforts = [step_size * ii for ii in range(population_size)]
+        # efforts = np.round(efforts, effort_resolution)
+        # base_effort = 1.0 / population_size
         
         genes = [[(np.random.rand() - 0.5) * 1, (np.random.rand() - 0.5) * 1] for ii in range(population_size)]
         population = [Fisherman(gene=genes[i]) for i in range(population_size)]
@@ -58,7 +58,7 @@ def evolutionary_dynamics(population = [],
             break
         
         # calculate profit
-        profits = [fisher.calculate_profit() for fisher in population]
+        profits = [fisher.calculate_and_set_profit() for fisher in population]
         population, population_fitness = calc_new_population(profits, population, population_fitness, stock, effort_resolution)
         if len(population) < 2:
             import pdb; pdb.set_trace()
