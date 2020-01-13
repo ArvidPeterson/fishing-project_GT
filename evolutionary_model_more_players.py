@@ -36,6 +36,7 @@ def evolutionary_dynamics(population_size,
     stock = FishStock(init_stock_size=5000)
     stock.X_history.append(stock.X)
 
+    # init 
     for t in range(n_generations):
         # check that population and counter is consistent
         if len(population) != len(population_fitness):
@@ -64,10 +65,11 @@ def evolutionary_dynamics(population_size,
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
 
-        plot_histogram(population, population_fitness, t, stock)
+        # plot_histogram(population, population_fitness, t, stock)
 
-    summation_of_profit(population)
+    # summation_of_profit(population)
     print('done')
+    return stock.X_history
 
 def calc_new_population(profits, population, population_fitness, 
             stock, effort_resolution, mutation_rate=MUTATION_RATE):
@@ -82,7 +84,7 @@ def calc_new_population(profits, population, population_fitness,
         # calculate steady state if all players played like fisher i
         steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         population_fitness[fisher] += int(scaling_factor*(fisher.profit - profits_mean) +
-                                          (0.01*min(steady_all_fisher_i, 0)))
+                                          (0.0*min(steady_all_fisher_i, 0)))
         fisher.population_history.append(population_fitness[fisher])
 
     
@@ -154,8 +156,8 @@ def summation_of_profit(population):
         plt.scatter(fisher.gene[0], fisher.gene[1], s=0.2*mean_profit_all_fishers[i], color='b', alpha=0.5)
 
     best_fisher = population[np.argmax(mean_profit_all_fishers)]
-    print(mean_profit_all_fishers)
-    import pdb; pdb.set_trace()
+    # print(mean_profit_all_fishers)
+    # import pdb; pdb.set_trace()
 
 if __name__ == '__main__':
         

@@ -1,10 +1,10 @@
-# Define macros defining sikmulation, use to this 
+# Define macros defining simulation, use to this 
 # file have convenient way of setting hyperparameters
     
 # Simulation loop
 POPULATION_SIZE = 20
 INIT_POP_FITNESS = 100
-MAX_SIM_TIME = 1000
+MAX_SIM_TIME = 200
 MUTATION_RATE = 1e-2
 EFFORT_MAX = 14
 EFFORT_MIN = 0
