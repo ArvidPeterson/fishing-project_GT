@@ -5,8 +5,8 @@ class Fisherman():
     def __init__(self, gene = [0.0, 0.0]):
         self.gene = gene
         self.effort = self.gene[0]
-        self.price_per_harvest = 20
-        self.cost_per_effort = 1
+        self.price_per_harvest = PRICE_PER_HARVEST
+        self.cost_per_effort = COST_PER_EFFORT
         self.harvest = 0
         self.profit = 0
         self.population_history = []
