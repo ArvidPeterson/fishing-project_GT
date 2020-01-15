@@ -53,23 +53,25 @@ def evolutionary_dynamics(population = [],
         stock.fish_stock_change_update_fisher_harvest(population)
         stock.X_history.append(stock.X)
 
-        if stock.X < 1.0:
+        if stock.X < 50:
             print(f'Stock depleated at {t}')
             break
         
         # calculate profit
         profits = [fisher.calculate_and_set_profit() for fisher in population]
-        population, population_fitness = calc_new_population(profits, population, population_fitness, stock, effort_resolution)
+        if not IS_REPEATED_GAME:
+            population, population_fitness = calc_new_population(profits, population, population_fitness, stock, effort_resolution)
+        
         if len(population) < 2:
             import pdb; pdb.set_trace()
             pass
         sys.stdout.write(f'\r generation: {t}\t nof species: {len(population)}')
         sys.stdout.flush()
-
-        plot_histogram(population, population_fitness, t, stock)
+        if DO_PLOT:
+            plot_histogram(population, population_fitness, t, stock)
         depletion_time = t
     close_all_figure_windows()
-    return population, population_fitness, depletion_time
+    return population, population_fitness, stock, depletion_time
 
 def calc_new_population(profits, population, population_fitness, 
             stock, effort_resolution, mutation_rate=MUTATION_RATE):
@@ -82,7 +84,9 @@ def calc_new_population(profits, population, population_fitness,
 
     for i, fisher in enumerate(population):
         # calculate steady state if all players played like fisher i
-        steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
+        steady_all_fisher_i = 0
+        if not IS_REPEATED_GAME:
+            steady_all_fisher_i = stock.carrying_cap*(1-(stock.catch_coeff/stock.growth_rate)*fisher.effort*nbr_players)
         # import pdb; pdb.set_trace()
         population_fitness[fisher] += scaling_factor*((fisher.profit - profits_mean) + 
                 (1 - IS_REPEATED_GAME) * (0.2*min(steady_all_fisher_i, 0)))
@@ -110,6 +114,8 @@ def calc_new_population(profits, population, population_fitness,
         if np.random.random() < mutation_rate:
             population[idx].gene[0] += np.round(sigma * np.random.randn(), effort_resolution)
             population[idx].gene[1] += np.round(sigma * np.random.randn(), effort_resolution)
+        if IS_REPEATED_GAME:
+            population[idx].profit_history = []
 
     if len(population) != len(population_fitness):
         import pdb; pdb.set_trace()
@@ -138,8 +144,8 @@ def mutate_population(population, population_fitness, mutation_rate=MUTATION_RAT
     return population, population_fitness
 
 if __name__ == '__main__':
-        
-        initialize_plot()
+        if DO_PLOT:
+            initialize_plot()
         evolutionary_dynamics(POPULATION_SIZE)
         plt.show()
 

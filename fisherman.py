@@ -12,6 +12,7 @@ class Fisherman():
         self.population_history = []
         self.profit_history = []
         self.gene_history = []
+        self.effort_history = []
 
     def calculate_and_set_profit(self):
         # print(f'HARVEST = {self.harvest}')
@@ -28,6 +29,7 @@ class Fisherman():
 
         self.effort = max(self.gene[0] + self.gene[1]*E_bar, 0)
         self.effort = min(5.0, self.effort)
+        self.effort_history.append(self.effort)
         
         # self.effort = self.gene[0] + self.gene[1]*E_bar
         # self.effort = self.effort

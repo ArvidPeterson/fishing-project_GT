@@ -3,3 +3,4 @@
 .coverage
 *.csv
 .DS_Store
+*.pkl

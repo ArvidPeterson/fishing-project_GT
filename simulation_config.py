@@ -13,7 +13,8 @@ POPULATION_SCALING_FACTOR = 0.1
 
 # if not repeated repeated game do 
 # use belief of future depletion time
-IS_REPEATED_GAME = False
+IS_REPEATED_GAME = True
+DO_PLOT = False
 
 # fisherman class
 PRICE_PER_HARVEST = 5

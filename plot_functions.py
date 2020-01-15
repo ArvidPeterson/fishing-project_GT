@@ -47,7 +47,7 @@ def plot_histogram(population, population_counter, generation, stock):
     fig.clf()
     ax = fig.gca()
     ax.plot(stock.X_history, color='b')
-    ax.set_title(f'Fish stock size')
+    ax.set_title(f'Fish stock size: {stock.X_history[-1]}')
     ax.set_xlabel('time')
     ax.set_ylabel('stock size')
     ax.set_ylim(0, CARRYING_CAP)
